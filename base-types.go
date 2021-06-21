@@ -23,6 +23,12 @@ type baseProgress struct {
 }
 
 func (p *baseProgress) Stop() {
+	if p.stop == nil {
+		return
+	}
+	if _, ok := <-p.stop; !ok {
+		return
+	}
 	p.stop <- struct{}{}
 	close(p.stop)
 }
