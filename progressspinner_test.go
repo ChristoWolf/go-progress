@@ -10,7 +10,7 @@ import (
 func TestStart(t *testing.T) {
 	var data = []struct {
 		delay    time.Duration
-		workTime time.Duration
+		busyTime time.Duration
 		want     int
 	}{
 		{time.Microsecond, time.Millisecond, 0},
@@ -19,10 +19,24 @@ func TestStart(t *testing.T) {
 		spy := writerSpy{}
 		prog := progress.NewProgressSpinner(row.delay, &spy)
 		go prog.Start()
-		time.Sleep(row.workTime)
+		time.Sleep(row.busyTime)
 		prog.Stop()
 		if got := spy.ticks; got <= row.want {
 			t.Errorf("got: %d, want: > %d", got, row.want)
 		}
 	}
+}
+
+// Simple example which demonstrates how to use the progress spinner.
+// Change the variables with 'example' prefix to custimze the example.
+func Example() {
+	exampleWriter := &writerSpy{}
+	exampleDelay := 100 * time.Millisecond
+	exampleBusyTime := 10 * time.Second
+	prog := progress.NewProgressSpinner(exampleDelay, exampleWriter)
+	go prog.Start()
+	time.Sleep(exampleBusyTime)
+	prog.Stop()
+	// Output:
+	//
 }
