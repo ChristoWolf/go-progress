@@ -1,6 +1,7 @@
 package progress_test
 
 import (
+	"strings"
 	"testing"
 	"time"
 
@@ -11,18 +12,18 @@ func TestStart(t *testing.T) {
 	var data = []struct {
 		delay    time.Duration
 		busyTime time.Duration
-		want     int
 	}{
-		{time.Microsecond, time.Millisecond, 0},
+		{time.Microsecond, time.Millisecond},
 	}
 	for _, row := range data {
 		spy := writerSpy{}
 		prog := progress.NewProgressSpinner(row.delay, &spy)
-		go prog.Start()
+		prog.Start()
 		time.Sleep(row.busyTime)
 		prog.Stop()
-		if got := spy.ticks; got <= row.want {
-			t.Errorf("got: %d, want: > %d", got, row.want)
+		want := spy.ticks - 1
+		if got := strings.Count(spy.string, "\b"); got != want && got <= 0 {
+			t.Errorf("got: %d, want: %d", got, want)
 		}
 	}
 }
@@ -34,7 +35,7 @@ func Example() {
 	exampleDelay := 100 * time.Millisecond
 	exampleBusyTime := 10 * time.Second
 	prog := progress.NewProgressSpinner(exampleDelay, exampleWriter)
-	go prog.Start()
+	prog.Start()
 	time.Sleep(exampleBusyTime)
 	prog.Stop()
 	// Output:

@@ -22,22 +22,25 @@ func NewProgressSpinner(delay time.Duration, sink io.Writer) Progresser {
 	return &progressSpinner{baseProgress{delay, sink, make(chan struct{}), nil}}
 }
 
-// Method for starting progress visualization.
-// Should be called as a goroutine to allow for asynchronous work execution
-// for which its progress is supposed to be visualized.
 func (p *progressSpinner) Start() error {
 	if p.ticker != nil {
-		return errors.New("spinner has already been started and/or stopped")
+		return errors.New("Progresser has already been started and/or stopped")
 	}
 	p.ticker = time.NewTicker(p.delay)
+	go p.work()
+	return nil
+}
+
+// Internally used method containing actual progress spinner visualization logic.
+// Should be called as a goroutine during Start() of a Progresser.
+func (p *progressSpinner) work() {
 	fmt.Fprintf(p.sink, "-")
-	defer p.ticker.Stop()
 	for {
 		for _, spin := range `\|/-` {
 			select {
 			case <-p.stop:
 				fmt.Fprintf(p.sink, "\b")
-				return nil
+				return
 			case <-p.ticker.C:
 				fmt.Fprintf(p.sink, "\b%c", spin)
 			}
