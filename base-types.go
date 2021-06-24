@@ -3,6 +3,7 @@ package progress
 import (
 	"errors"
 	"io"
+	"sync"
 	"time"
 )
 
@@ -26,6 +27,7 @@ type baseProgress struct {
 	sink   io.Writer
 	stop   chan struct{}
 	ticker *time.Ticker
+	wg     sync.WaitGroup
 }
 
 // Method usually used for Progressor implementations (which make use of baseProgress)
@@ -40,10 +42,11 @@ func (p *baseProgress) Stop() error {
 			return errors.New("channel has already been stopped")
 		}
 	default:
+		p.ticker.Stop()
 		p.stop <- struct{}{}
 		close(p.stop)
-		p.ticker.Stop()
 		p.ticker = nil
 	}
+	p.wg.Wait()
 	return nil
 }

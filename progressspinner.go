@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"sync"
 	"time"
 )
 
@@ -19,7 +20,7 @@ type progressSpinner struct {
 //
 // - and the sink where the visualization is written to.
 func NewProgressSpinner(delay time.Duration, sink io.Writer) Progresser {
-	return &progressSpinner{baseProgress{delay, sink, make(chan struct{}), nil}}
+	return &progressSpinner{baseProgress{delay, sink, make(chan struct{}), nil, sync.WaitGroup{}}}
 }
 
 // Starts concurrent spinner progress visualization.
@@ -29,6 +30,7 @@ func (p *progressSpinner) Start() error {
 		return errors.New("progress spinner has already been started and/or stopped")
 	}
 	p.ticker = time.NewTicker(p.delay)
+	p.wg.Add(1)
 	go p.work()
 	return nil
 }
@@ -36,12 +38,13 @@ func (p *progressSpinner) Start() error {
 // Internally used method containing actual progress spinner visualization logic.
 // Should be called as a goroutine during Start() of a Progresser.
 func (p *progressSpinner) work() {
+	defer p.wg.Done()
 	fmt.Fprintf(p.sink, "-")
 	for {
 		for _, spin := range `\|/-` {
 			select {
 			case <-p.stop:
-				fmt.Fprintf(p.sink, "\b")
+				fmt.Fprint(p.sink, "\b")
 				return
 			case <-p.ticker.C:
 				fmt.Fprintf(p.sink, "\b%c", spin)
