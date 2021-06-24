@@ -8,7 +8,7 @@ import (
 	"github.com/christowolf/go-progress"
 )
 
-func TestStart(t *testing.T) {
+func TestProgressSpinnerStart(t *testing.T) {
 	var data = []struct {
 		delay    time.Duration
 		busyTime time.Duration
@@ -30,7 +30,7 @@ func TestStart(t *testing.T) {
 
 // Simple example which demonstrates how to use the progress spinner.
 // Change the variables with 'example' prefix to custimze the example.
-func Example() {
+func ExampleProgressSpinner() {
 	exampleWriter := &writerSpy{}
 	exampleDelay := 100 * time.Millisecond
 	exampleBusyTime := 10 * time.Second
