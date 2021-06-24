@@ -8,9 +8,10 @@ import (
 
 // Progresser is an interface which defines contracts for interacting with simple progress visualizers.
 type Progresser interface {
-	// Method for starting progress visualization.
+	// Method for starting concurrent progress visualization.
+	// Execution of the caller goroutine continues and progress visualization may be stoped using Stop().
 	Start() error
-	// Method for stopping execution of goroutines triggered by STart() via signaling and closing related channels.
+	// Method for stopping execution of goroutines triggered by Start() via signaling and closing related channels.
 	Stop() error
 	// Internally used method containing actual progress visualization logic specific to each Progresser implementation.
 	// Should be called as a goroutine during Start() of a Progresser.

@@ -22,9 +22,11 @@ func NewProgressSpinner(delay time.Duration, sink io.Writer) Progresser {
 	return &progressSpinner{baseProgress{delay, sink, make(chan struct{}), nil}}
 }
 
+// Starts concurrent spinner progress visualization.
+// Execution of the caller goroutine continues and progress visualization may be stoped using Stop().
 func (p *progressSpinner) Start() error {
 	if p.ticker != nil {
-		return errors.New("Progresser has already been started and/or stopped")
+		return errors.New("progress spinner has already been started and/or stopped")
 	}
 	p.ticker = time.NewTicker(p.delay)
 	go p.work()
