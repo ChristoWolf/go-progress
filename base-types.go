@@ -36,10 +36,17 @@ func (p *baseProgress) Stop() error {
 	if p.stop == nil {
 		return errors.New("no channel to stop")
 	}
+	if p.ticker == nil {
+		return errors.New("no ticker to stop")
+	}
 	select {
 	case _, ok := <-p.stop: // Safety check to ensure that the channel is not closed already.
 		if !ok {
 			return errors.New("channel has already been stopped")
+		}
+	case _, ok := <-p.ticker.C: // Safety check to ensure that the ticker is not stopped already.
+		if !ok {
+			return errors.New("ticker has already been stopped")
 		}
 	default:
 		p.ticker.Stop()
