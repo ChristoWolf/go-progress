@@ -55,6 +55,11 @@ jobs:
         skip-pkg-cache: true
         # if set to true then the action don't cache or restore ~/.cache/go-build.
         skip-build-cache: true
+        exclude-rules:
+        # Exclude some linters from running on tests files, see https://github.com/golangci/golangci-lint/pull/496#issuecomment-485085332.
+        - path: _test\.go
+          linters:
+            - errcheck
 
   gosec:
     name: Scan code for security issues
