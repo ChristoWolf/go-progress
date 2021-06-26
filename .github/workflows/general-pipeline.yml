@@ -45,7 +45,7 @@ jobs:
         # version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
         version: latest
         # golangci-lint command line arguments
-        args: -disable errcheck
+        args: --disable errcheck
         # if set to true and the action runs on a pull request - the action outputs only newly found issues
         only-new-issues: false
         # if set to true then action uses pre-installed Go
@@ -57,7 +57,7 @@ jobs:
 
   gosec:
     name: Scan code for security issues
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
