@@ -1,6 +1,8 @@
 # go-progress
 Simple API for visualizing and outputting progress to various sinks.
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/christowolf/go-progress.svg)](https://pkg.go.dev/github.com/christowolf/go-progress) ![version](https://img.shields.io/github/v/release/ChristoWolf/go-progress?color=purple&style=flat-square) ![build-tests-checks](https://img.shields.io/github/workflow/status/ChristoWolf/go-progress/Go/main?label=build%2C%20tests%20and%20other%20checks&style=flat-square) ![coverage](https://img.shields.io/codecov/c/github/ChristoWolf/go-progress?style=flat-square)
+
 ## Installation
 As usual, simply install the module via executing
 ```

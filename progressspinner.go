@@ -24,7 +24,7 @@ func NewProgressSpinner(delay time.Duration, sink io.Writer) Progresser {
 }
 
 // Starts concurrent spinner progress visualization.
-// Execution of the caller goroutine continues and progress visualization may be stoped using Stop().
+// Execution of the caller goroutine continues and progress visualization may be stopped using Stop().
 func (p *progressSpinner) Start() error {
 	if p.ticker != nil {
 		return errors.New("progress spinner has already been started and/or stopped")
