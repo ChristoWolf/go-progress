@@ -25,7 +25,7 @@ func NewProgressDots(delay time.Duration, sink io.Writer, message string) Progre
 }
 
 // Starts concurrent progress dots visualization.
-// Execution of the caller goroutine continues and progress visualization may be stoped using Stop().
+// Execution of the caller goroutine continues and progress visualization may be stopped using Stop().
 func (p *progressDots) Start() error {
 	if p.ticker != nil {
 		return errors.New("progress dots visualization has already been started and/or stopped")
