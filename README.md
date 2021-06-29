@@ -15,7 +15,7 @@ If needed, specify your desired version to install via the usual version suffix.
 ## Usage
 1. Import the `progress` package by adding
    ```go
-   import "github.com/christowolf/go-progress/progress"
+   import "github.com/christowolf/go-progress"
    ```
    to your package and update your mod file as usual.
 2. Use any of the `progress.New...` functions to create an instance of your desired progress visualization.
