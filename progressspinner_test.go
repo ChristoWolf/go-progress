@@ -60,7 +60,10 @@ func TestProgressSpinnerStopError(t *testing.T) {
 
 // Simple example which demonstrates how to use the progress spinner.
 // Change the variables with 'example' prefix to customize the example.
-// No output is checked here due to tick randomness.
+// No output is checked here due to tick randomness
+// and the fact that '\b' is non-destructive (similarly to e.g. '\r', '\n'),
+// i.e. it only changes the output's cursor position,
+// but does NOT overwrite/delete the target position's content.
 func ExampleNewProgressSpinner() {
 	exampleDelay := 100 * time.Millisecond
 	exampleBusyTime := 2 * time.Second
