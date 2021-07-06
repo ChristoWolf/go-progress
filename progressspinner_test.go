@@ -1,6 +1,7 @@
 package progress_test
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -12,6 +13,7 @@ import (
 
 // Tests common use cases of the progress spinner.
 func TestProgressSpinnerNewStartStop(t *testing.T) {
+	t.Parallel()
 	var data = []struct {
 		delay    time.Duration
 		busyTime time.Duration
@@ -19,21 +21,26 @@ func TestProgressSpinnerNewStartStop(t *testing.T) {
 		{time.Microsecond, time.Millisecond},
 		{time.Microsecond, 50 * time.Millisecond},
 	}
-	for _, row := range data { // TODO: Could be parallelized, see https://gist.github.com/posener/92a55c4cd441fc5e5e85f27bca008721.
-		spy := writerSpy{}
-		prog := progress.NewProgressSpinner(row.delay, &spy)
-		prog.Start()
-		time.Sleep(row.busyTime)
-		prog.Stop()
-		want := spy.ticks - 1                                                // One less to take extra call to io.Writer.Write() into account.
-		if got := strings.Count(spy.string, "\b"); got != want || got <= 0 { // TODO: Could be improved by manually constructing 'want' from spy.ticks.
-			t.Errorf("got: %d, want: %d", got, want)
-		}
+	for _, row := range data {
+		row := row
+		t.Run(fmt.Sprintf("%d/%d", row.delay, row.busyTime), func(t *testing.T) {
+			t.Parallel()
+			spy := writerSpy{}
+			prog := progress.NewProgressSpinner(row.delay, &spy)
+			prog.Start()
+			time.Sleep(row.busyTime)
+			prog.Stop()
+			want := spy.ticks - 1                                                // One less to take extra call to io.Writer.Write() into account.
+			if got := strings.Count(spy.string, "\b"); got != want || got <= 0 { // TODO: Could be improved by manually constructing 'want' from spy.ticks.
+				t.Errorf("got: %d, want: %d", got, want)
+			}
+		})
 	}
 }
 
 // Tests if Start() errors out when it was already called before without stopping.
 func TestProgressSpinnerStartError(t *testing.T) {
+	t.Parallel()
 	prog := progress.NewProgressSpinner(time.Millisecond, &writerSpy{})
 	if got := prog.Start(); !cmp.Equal(got, nil) {
 		t.Errorf("got: %v, want: %v", got, nil)
@@ -45,6 +52,7 @@ func TestProgressSpinnerStartError(t *testing.T) {
 
 // Tests if Stop() errors out when there is nothing to stop.
 func TestProgressSpinnerStopError(t *testing.T) {
+	t.Parallel()
 	prog := progress.NewProgressSpinner(time.Millisecond, &writerSpy{})
 	if got := prog.Stop(); cmp.Equal(got, nil) {
 		t.Errorf("got: %v, want: %v", got, nil)

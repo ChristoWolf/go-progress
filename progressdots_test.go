@@ -1,6 +1,7 @@
 package progress_test
 
 import (
+	"fmt"
 	"os"
 	"testing"
 	"time"
@@ -11,6 +12,7 @@ import (
 
 // Tests common use cases of the progress dots visualization.
 func TestProgressDotsNewStartStop(t *testing.T) {
+	t.Parallel()
 	var data = []struct {
 		delay    time.Duration
 		busyTime time.Duration
@@ -19,24 +21,29 @@ func TestProgressDotsNewStartStop(t *testing.T) {
 		{time.Microsecond, time.Millisecond, "test message 1"},
 		{time.Microsecond, 50 * time.Millisecond, "test message 2"},
 	}
-	for _, row := range data { // TODO: Could be parallelized, see https://gist.github.com/posener/92a55c4cd441fc5e5e85f27bca008721.
-		spy := writerSpy{}
-		prog := progress.NewProgressDots(row.delay, &spy, row.message)
-		prog.Start()
-		time.Sleep(row.busyTime)
-		prog.Stop()
-		want := row.message
-		for i := 0; i < spy.ticks-1; i++ { // One less to take extra call (to print the message text) to io.Writer.Write() into account.
-			want += "."
-		}
-		if got := spy.string; got != want || spy.ticks <= 0 {
-			t.Errorf("got: %v, want: %v", got, want)
-		}
+	for _, row := range data {
+		row := row
+		t.Run(fmt.Sprintf("%d/%d/%s", row.delay, row.busyTime, row.message), func(t *testing.T) {
+			t.Parallel()
+			spy := writerSpy{}
+			prog := progress.NewProgressDots(row.delay, &spy, row.message)
+			prog.Start()
+			time.Sleep(row.busyTime)
+			prog.Stop()
+			want := row.message
+			for i := 0; i < spy.ticks-1; i++ { // One less to take extra call (to print the message text) to io.Writer.Write() into account.
+				want += "."
+			}
+			if got := spy.string; got != want || spy.ticks <= 0 {
+				t.Errorf("got: %v, want: %v", got, want)
+			}
+		})
 	}
 }
 
 // Tests if Start() errors out when it was already called before without stopping.
 func TestProgressDotsStartError(t *testing.T) {
+	t.Parallel()
 	prog := progress.NewProgressDots(time.Millisecond, &writerSpy{}, "TEST")
 	if got := prog.Start(); !cmp.Equal(got, nil) {
 		t.Errorf("got: %v, want: %v", got, nil)
@@ -48,6 +55,7 @@ func TestProgressDotsStartError(t *testing.T) {
 
 // Tests if Stop() errors out when there is nothing to stop.
 func TestProgressDotsStopError(t *testing.T) {
+	t.Parallel()
 	prog := progress.NewProgressDots(time.Millisecond, &writerSpy{}, "TEST")
 	if got := prog.Stop(); cmp.Equal(got, nil) {
 		t.Errorf("got: %v, want: %v", got, nil)
