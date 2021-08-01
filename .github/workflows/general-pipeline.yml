@@ -11,7 +11,7 @@ jobs:
 
   buildtestcover:
     name: Build, test and cover using Go tools
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
 
