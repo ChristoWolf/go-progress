@@ -7,20 +7,8 @@ import (
 	"time"
 )
 
-// Progresser is an interface which defines contracts for interacting with simple progress visualizers.
-type Progresser interface {
-	// Method for starting concurrent progress visualization.
-	// Execution of the caller goroutine continues and progress visualization may be stopped using Stop().
-	Start() error
-	// Method for stopping execution of goroutines triggered by Start() via signaling and closing related channels.
-	Stop() error
-	// Internally used method containing actual progress visualization logic specific to each Progresser implementation.
-	// Should be called as a goroutine during Start() of a Progresser.
-	work()
-}
-
-// Base type which provides common fields to eassily supply progress visualization logic.
-// Should be via struct embedding it as an anonymous field in Progresser implementations.
+// Base type which provides common fields to easily supply progress visualization logic.
+// Should be embedded as an anonymous field in concrete progress visualization struct implementations.
 // Supports arbitrary visualization sinks; everything which implements io.Writer.
 type baseProgress struct {
 	delay  time.Duration
@@ -30,8 +18,8 @@ type baseProgress struct {
 	wg     sync.WaitGroup
 }
 
-// Method usually used for Progressor implementations (which make use of baseProgress)
-// for signaling the progress to stop and closing its channels.
+// Method for signaling the progress visualizer
+// (which make use of baseProgress) to stop and close its channels.
 func (p *baseProgress) Stop() error {
 	if p.stop == nil {
 		return errors.New("no channel to stop")
@@ -48,12 +36,11 @@ func (p *baseProgress) Stop() error {
 		if !ok {
 			return errors.New("ticker has already been stopped")
 		}
-	default:
-		p.ticker.Stop()
-		p.stop <- struct{}{}
-		close(p.stop)
-		p.ticker = nil
 	}
+	p.ticker.Stop()
+	p.stop <- struct{}{}
+	close(p.stop)
+	p.ticker = nil
 	p.wg.Wait()
 	return nil
 }

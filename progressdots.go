@@ -9,7 +9,7 @@ import (
 )
 
 // A simple progress spinner for displaying asynchronous activity.
-type progressDots struct {
+type ProgressDots struct {
 	baseProgress
 	message string
 }
@@ -20,13 +20,13 @@ type progressDots struct {
 // - they delay between visualization frames,
 //
 // - and the sink where the visualization is written to.
-func NewProgressDots(delay time.Duration, sink io.Writer, message string) Progresser {
-	return &progressDots{baseProgress{delay, sink, make(chan struct{}), nil, sync.WaitGroup{}}, message}
+func NewProgressDots(delay time.Duration, sink io.Writer, message string) *ProgressDots {
+	return &ProgressDots{baseProgress{delay, sink, make(chan struct{}), nil, sync.WaitGroup{}}, message}
 }
 
 // Starts concurrent progress dots visualization.
 // Execution of the caller goroutine continues and progress visualization may be stopped using Stop().
-func (p *progressDots) Start() error {
+func (p *ProgressDots) Start() error {
 	if p.ticker != nil {
 		return errors.New("progress dots visualization has already been started and/or stopped")
 	}
@@ -37,8 +37,8 @@ func (p *progressDots) Start() error {
 }
 
 // Internally used method containing actual progress dots visualization logic.
-// Should be called as a goroutine during Start() of a Progresser.
-func (p *progressDots) work() {
+// Should be called as a goroutine during Start() of a ProgressDots.
+func (p *ProgressDots) work() {
 	defer p.wg.Done()
 	fmt.Fprint(p.sink, p.message)
 	for {
