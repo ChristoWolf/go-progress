@@ -22,7 +22,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: ${{ gover }}
+        go-version: ${{ matrix.gover }}
 
     - name: Build
       run: go build -v ./...
