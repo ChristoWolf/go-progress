@@ -8,7 +8,7 @@ import (
 )
 
 // Base type which provides common fields to easily supply progress visualization logic.
-// Should be via struct embedding it as an anonymous field in concrete progress visualization struct implementations.
+// Should be embedded as an anonymous field in concrete progress visualization struct implementations.
 // Supports arbitrary visualization sinks; everything which implements io.Writer.
 type baseProgress struct {
 	delay  time.Duration
@@ -36,12 +36,11 @@ func (p *baseProgress) Stop() error {
 		if !ok {
 			return errors.New("ticker has already been stopped")
 		}
-	default:
-		p.ticker.Stop()
-		p.stop <- struct{}{}
-		close(p.stop)
-		p.ticker = nil
 	}
+	p.ticker.Stop()
+	p.stop <- struct{}{}
+	close(p.stop)
+	p.ticker = nil
 	p.wg.Wait()
 	return nil
 }
