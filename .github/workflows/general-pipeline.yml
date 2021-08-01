@@ -4,21 +4,25 @@ on:
   workflow_dispatch:
   push:
     branches: [ '**' ]
-  pull_request:
-    branches: [ 'main' ]
+  #pull_request:
+  #  branches: [ 'main' ]
 
 jobs:
 
   buildtestcover:
     name: Build, test and cover using Go tools
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        gover: [1.16]
     steps:
     - uses: actions/checkout@v2
 
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.16
+        go-version: ${{ gover }}
 
     - name: Build
       run: go build -v ./...
